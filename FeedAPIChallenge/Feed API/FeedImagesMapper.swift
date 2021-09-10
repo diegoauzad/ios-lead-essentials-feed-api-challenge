@@ -9,7 +9,7 @@
 import Foundation
 
 final class FeedImagesMapper {
-	struct Container: Decodable {
+	private struct Container: Decodable {
 		private let items: [ImageItem]
 
 		var feedImages: [FeedImage] {
