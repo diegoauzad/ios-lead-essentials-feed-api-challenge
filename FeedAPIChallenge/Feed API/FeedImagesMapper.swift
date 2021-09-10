@@ -10,14 +10,14 @@ import Foundation
 
 final class FeedImagesMapper {
 	struct Container: Decodable {
-		let items: [ImageItem]
+		private let items: [ImageItem]
 
 		var feedImages: [FeedImage] {
 			return items.map({ $0.feedImage })
 		}
 	}
 
-	struct ImageItem: Decodable {
+	private struct ImageItem: Decodable {
 		let id: UUID
 		let description: String?
 		let location: String?
@@ -32,6 +32,14 @@ final class FeedImagesMapper {
 
 		var feedImage: FeedImage {
 			return FeedImage(id: id, description: description, location: location, url: image)
+		}
+	}
+
+	static func map(_ data: Data, _ response: HTTPURLResponse) -> RemoteFeedLoader.Result {
+		if response.statusCode == 200, let container = try? JSONDecoder().decode(FeedImagesMapper.Container.self, from: data) {
+			return .success(container.feedImages)
+		} else {
+			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
 	}
 }
